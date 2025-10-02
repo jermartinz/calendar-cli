@@ -1,10 +1,17 @@
-/*
-Copyright © 2025 NAME HERE <EMAIL ADDRESS>
-*/
 package main
 
-import "github.com/jermartinz/calendar-cli/cmd"
+import (
+	"fmt"
+	"os"
+
+	tea "github.com/charmbracelet/bubbletea"
+	"github.com/jermartinz/calendar-cli/internal/tui"
+)
 
 func main() {
-	cmd.Execute()
+	p := tea.NewProgram(tui.InitialModel())
+	if _, err := p.Run(); err != nil {
+		fmt.Printf("Error: %v", err)
+		os.Exit(1)
+	}
 }
