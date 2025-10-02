@@ -2,6 +2,8 @@
 
 A simple and elegant terminal-based calendar application built with Go, Cobra, and Bubble Tea.
 
+![Calendar CLI Preview](assets/calendarCLI.png)
+
 > **Note**: This project is currently under active development.
 
 ## Features
