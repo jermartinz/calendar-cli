@@ -21,7 +21,7 @@ var (
 
 	todayStyle = lipgloss.NewStyle().
 			Foreground(lipgloss.Color("229")).
-			Background(lipgloss.Color("57")).
+			Background(lipgloss.Color("110")).
 			Bold(true)
 
 	dimStyle = lipgloss.NewStyle().
@@ -29,7 +29,7 @@ var (
 
 	titleStyle = lipgloss.NewStyle().
 			Bold(true).
-			Foreground(lipgloss.Color("205"))
+			Foreground(lipgloss.Color("222"))
 
 	borderStyle = lipgloss.NewStyle().
 			BorderStyle(lipgloss.NormalBorder()).
@@ -78,23 +78,32 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m model) View() string {
 	titleText := fmt.Sprintf("%s %d", m.month.String(), m.year)
-	calendarWidth := 35
+	calendarWidth := 56 // 7 days × 8 characters = 56
 	title := titleStyle.Width(calendarWidth).Align(lipgloss.Center).Render(titleText)
 
 	var b strings.Builder
 
-	days := []string{"Sun", " Mon ", " Tue ", " Wed ", " Thu ", " Fri ", " Sun "}
+	// Each day has 8 characters: 2 spaces + name (3 chars) + 3 spaces
+	days := []string{"  Sun   ", "  Mon   ", "  Tue   ", "  Wed   ", "  Thu   ", "  Fri   ", "  Sat   "}
 	for _, day := range days {
 		b.WriteString(headerStyle.Render(day))
 	}
-	b.WriteString("\n")
+	b.WriteString("\n\n")
 
-	// Calendar Generation
+	// Calendar Gen
 	weeks := calendar.CalendarGen(m.year, m.month)
 
-	for _, week := range weeks {
+	for i, week := range weeks {
 		for _, cell := range week {
-			cellText := fmt.Sprintf(" %2d  ", cell.Day)
+			// Center numbers in 8 characters
+			// For 1 digit: 3 spaces + number + 4 spaces = 8
+			// For 2 digits: 3 spaces + number + 3 spaces = 8
+			var cellText string
+			if cell.Day < 10 {
+				cellText = fmt.Sprintf("   %d    ", cell.Day)
+			} else {
+				cellText = fmt.Sprintf("   %d   ", cell.Day)
+			}
 
 			if cell.IsToday {
 				b.WriteString(todayStyle.Render(cellText))
@@ -105,6 +114,10 @@ func (m model) View() string {
 			}
 		}
 		b.WriteString("\n")
+		// Add empty line between weeks for extra height
+		if i < len(weeks)-1 {
+			b.WriteString("\n")
+		}
 	}
 
 	help := lipgloss.NewStyle().
